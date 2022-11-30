@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^1.9.1",
     "axios": "^1.2.0",
     "bootstrap": "^5.2.3",
     "loadash": "^1.0.0",
@@ -17,11 +18,13 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.39.5",
     "react-icons": "^4.6.0",
+    "react-redux": "^8.0.5",
     "react-router-dom": "^6.4.3",
     "react-toastify": "^9.1.1",
     "react-virtualized-auto-sizer": "^1.0.7",
     "react-window": "^1.8.8",
-    "reactstrap": "^9.1.5"
+    "reactstrap": "^9.1.5",
+    "redux": "^4.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.24",

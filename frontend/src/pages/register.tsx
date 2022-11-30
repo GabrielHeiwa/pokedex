@@ -100,6 +100,4 @@ function Register() {
 }
 
 export { Register };
-function isAuthenticated() {
-	throw new Error("Function not implemented.");
-}
+

@@ -14,11 +14,16 @@ import {
 	Form,
 	Input,
 	InputGroup,
+	Modal,
+	ModalBody,
+	ModalHeader,
 	Spinner,
 } from "reactstrap";
 import { PokemonCard } from "../components/pokemon";
 import { useAuth } from "../hooks/auth";
 import { pokeApi } from "../services/pokeApi";
+import { useSelector, useDispatch } from "react-redux";
+import { pokemonSelector } from "../redux/slices/pokemons";
 
 const TOTAL_OF_POKEMONS = 1154;
 
@@ -74,13 +79,13 @@ function App() {
 
 	// States
 	const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-	const [page, setPage] = useState(1);
 	const [fetchMore, setFetchMore] = useState(false);
 	const [searching, setSearching] = useState(false);
 	const [search, setSearch] = useState("");
 	const [list, setList] = useState<Pokemon[]>([]);
 	const [progress, setProgress] = useState(0);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
+	const [showPokemonTeam, setShowPokemonTeam] = useState(false);
 
 	const toggle = () => setDropdownOpen((prevState) => !prevState);
 
@@ -107,7 +112,7 @@ function App() {
 	async function getPokemons() {
 		CALLING = true;
 
-		const fetchPokemons = await pokeApi.listPokemons(0, 1154);
+		const fetchPokemons = await pokeApi.listPokemons(0, 5);
 		const _pokemons: Pokemon[] = [];
 		let _progress = 0;
 
@@ -143,15 +148,9 @@ function App() {
 
 	// UseEffects
 	useEffect(() => {
-		// if (!CALLING) getPokemons();
+		if (!CALLING) getPokemons();
 		isAuthenticated().catch((_) => window.location.replace("/login"));
 	}, []);
-
-	useEffect(() => {
-		if (fetchMore) {
-			setPage((curr) => curr + 1);
-		}
-	}, [fetchMore]);
 
 	useEffect(() => {
 		const _list =
@@ -164,6 +163,12 @@ function App() {
 
 	return (
 		<div>
+			{showPokemonTeam && (
+				<PokemonTeam
+					handleCloseModal={() => setShowPokemonTeam(false)}
+				/>
+			)}
+
 			<header
 				style={styles.header}
 				className='mx-2'
@@ -211,22 +216,6 @@ function App() {
 				<p className='py-2 text-center'>
 					Baixando os pokemons: {progress}/{TOTAL_OF_POKEMONS}
 				</p>
-
-				{/* <Row className='text-center m-0 py-2'>
-					<span
-						className='col btn btn-primary mx-4'
-						onClick={() => setPage(page - 1 ? page - 1 : 1)}
-					>
-						Anterior
-					</span>
-					<span className='col-1 my-2'>{page}</span>
-					<span
-						className='col btn btn-primary mx-4'
-						onClick={() => setPage(page + 1)}
-					>
-						Proxímo
-					</span>
-				</Row> */}
 
 				{pokemons.length ? (
 					<AutoSizer>
@@ -285,21 +274,44 @@ function App() {
 						</DropdownToggle>
 
 						<DropdownMenu>
-							<DropdownItem>Time pokemon</DropdownItem>
+							<DropdownItem
+								onClick={() =>
+									setShowPokemonTeam((curr) => !curr)
+								}
+							>
+								Time pokemon
+							</DropdownItem>
 						</DropdownMenu>
 					</Dropdown>
 				</div>
 			</main>
-
-			{fetchMore && (
-				<p className='d-flex justify-content-center my-4 py-4'>
-					<Spinner
-						size='md'
-						color='primary'
-					/>
-				</p>
-			)}
 		</div>
+	);
+}
+
+type PokemonTeamProps = {
+	handleCloseModal: () => void;
+};
+
+function PokemonTeam({ handleCloseModal }: PokemonTeamProps) {
+	// Redux
+	const { team } = useSelector(pokemonSelector);
+
+	return (
+		<Modal
+			isOpen
+			size=""
+			centered
+		>
+			<ModalHeader toggle={handleCloseModal}>
+				<h2>Time Pokemon</h2>
+			</ModalHeader>
+			<ModalBody>
+				{team.map((pokemon) => (
+					<PokemonCard pokemon={pokemon} />
+				))}
+			</ModalBody>
+		</Modal>
 	);
 }
 

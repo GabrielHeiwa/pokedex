@@ -11,8 +11,8 @@ datasource db {
 }
 
 model Trainer {
-  id            String @id @default(uuid())
-  trainer_name  String @unique
+  id            String  @id @default(uuid())
+  trainer_name  String  @unique
   password      String
   Team          Team[]
   access_token  String?
@@ -22,19 +22,20 @@ model Trainer {
 }
 
 model Team {
-  id        String    @id @default(uuid())
-  Trainer   Trainer   @relation(fields: [trainerId], references: [id])
+  id        String   @id @default(uuid())
+  Trainer   Trainer  @relation(fields: [trainerId], references: [id])
   trainerId String
-  pokemons  Pokemon[]
+  pokemons  Pokemon? @relation(fields: [pokemonId], references: [id])
+  pokemonId String?
 
   @@map("teams")
 }
 
 model Pokemon {
-  id     String  @id @default(uuid())
-  data   String
-  Team   Team?   @relation(fields: [teamId], references: [id])
-  teamId String?
+  id   String @id @default(uuid())
+  name String @unique
+  data String
+  Team Team[]
 
   @@map("pokemons")
 }

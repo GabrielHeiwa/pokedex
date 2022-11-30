@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { favoritePokemon } from "./useCases/favoritePokemon";
 import { loginUser } from "./useCases/loginUser";
 import { meUser } from "./useCases/meUser";
 import { registerUser } from "./useCases/registerUser";
@@ -10,7 +11,7 @@ router.get("/", (req, res) => res.send("Hello world"));
 router.post("/login", loginUser);
 router.post("/register", registerUser);
 router.post("/me", meUser);
-router.post("/favorite", (req, res) => res.send("ok"));
+router.post("/favorite", favoritePokemon);
 router.post("/disfavorite", (req, res) => res.send("ok"));
 
 export { router };
