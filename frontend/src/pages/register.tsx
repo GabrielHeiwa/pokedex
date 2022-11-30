@@ -20,14 +20,16 @@ function Register() {
 			setCookie("@pokedex/trainerId", response.data.trainerId, 1);
 			window.location.replace("/pokedex");
 		} catch (error: any) {
-			const errorMessage = error.message || error.response.data.message;
+			const errorMessage =  error.response.data.message || error.message;
 			toast.error(errorMessage);
 		}
 	}
 
 	// UseEffects
 	useEffect(() => {
-		isAuthenticated().then((_) => window.location.replace("/pokedex"));
+		isAuthenticated().then((_) =>
+			_ ? window.location.replace("/pokedex") : () => {}
+		);
 	}, []);
 
 	return (
@@ -100,4 +102,3 @@ function Register() {
 }
 
 export { Register };
-

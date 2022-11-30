@@ -1,9 +1,10 @@
 import { createContext } from "react";
 import { api } from "../services/api";
-import { getCookie } from "../utils/cookies";
+import { getCookie, setCookie } from "../utils/cookies";
 
 type AuthContextType = {
 	isAuthenticated: () => Promise<boolean>;
+	logout: () => void;
 };
 
 type AuthProviderProps = {
@@ -25,8 +26,13 @@ function AuthProvider({ children }: AuthProviderProps) {
 			.catch((_) => false);
 	}
 
+	function logout() {
+		setCookie("@pokedex/trainerId", "", 0);
+		window.location.replace("/login")
+	}
+
 	return (
-		<AuthContext.Provider value={{ isAuthenticated }}>
+		<AuthContext.Provider value={{ isAuthenticated, logout }}>
 			{children}
 		</AuthContext.Provider>
 	);

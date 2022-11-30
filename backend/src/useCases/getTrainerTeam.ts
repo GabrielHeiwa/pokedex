@@ -1,19 +1,22 @@
 import { prisma } from "../database/connection";
 import type { Request, Response } from "express";
 
-async function desfavoritePokemon(req: Request, res: Response) {
+async function getTrainerTeam(req: Request, res: Response) {
 	try {
-		const { pokemonName, trainerId } = req.body;
+		const { trainerId } = req.body;
 
-		await prisma.team.deleteMany({
+		const team = await prisma.team.findMany({
 			where: {
-				pokemonName,
 				trainerId,
+			},
+			select: {
+				pokemons: true
 			}
-		})
+		});
 
 		return res.status(200).json({
-			message: "Pokemon removido do time com sucesso",
+			message: "Time pokemon carregado com sucesso",
+			team,
 		});
 	} catch (error: any) {
 		const errorMessage = error.message;
@@ -21,4 +24,4 @@ async function desfavoritePokemon(req: Request, res: Response) {
 	}
 }
 
-export { desfavoritePokemon };
+export { getTrainerTeam };

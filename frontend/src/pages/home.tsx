@@ -23,7 +23,9 @@ import { PokemonCard } from "../components/pokemon";
 import { useAuth } from "../hooks/auth";
 import { pokeApi } from "../services/pokeApi";
 import { useSelector, useDispatch } from "react-redux";
-import { pokemonSelector } from "../redux/slices/pokemons";
+import { pokemonSelector, setTeam } from "../redux/slices/pokemons";
+import { api } from "../services/api";
+import { getCookie } from "../utils/cookies";
 
 const TOTAL_OF_POKEMONS = 1154;
 
@@ -75,7 +77,7 @@ const styles: Record<string, React.CSSProperties> = {
 
 function App() {
 	// Contexts
-	const { isAuthenticated } = useAuth();
+	const { isAuthenticated, logout } = useAuth();
 
 	// States
 	const [pokemons, setPokemons] = useState<Pokemon[]>([]);
@@ -87,7 +89,9 @@ function App() {
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const [showPokemonTeam, setShowPokemonTeam] = useState(false);
 
-	const toggle = () => setDropdownOpen((prevState) => !prevState);
+	// Redux
+	const dispatch = useDispatch();
+	const { team } = useSelector(pokemonSelector);
 
 	// Hooks
 	const { control, handleSubmit } = useForm();
@@ -112,7 +116,7 @@ function App() {
 	async function getPokemons() {
 		CALLING = true;
 
-		const fetchPokemons = await pokeApi.listPokemons(0, 5);
+		const fetchPokemons = await pokeApi.listPokemons(0, 1154);
 		const _pokemons: Pokemon[] = [];
 		let _progress = 0;
 
@@ -146,10 +150,43 @@ function App() {
 		CALLING = false;
 	}
 
+	async function getPokemonTeam() {
+		try {
+			const { data } = await api.post("/team", {
+				trainerId: getCookie("@pokedex/trainerId"),
+			});
+
+			const _team = new Map();
+			data.team.map((pokemon: any) => {
+				const _pokemon = JSON.parse(pokemon.pokemons.data);
+				_team.set(_pokemon.name, _pokemon);
+			});
+
+			team.map(pokemon => {
+				_team.set(pokemon.name, pokemon);
+			});
+
+			dispatch(setTeam([..._team.values()]));
+		} catch (error: any) {
+			const errorMessage = error?.response.data.message || error.message;
+			toast.error(errorMessage);
+		}
+
+		return;
+	}
+
+	// Arrow functions
+	const toggle = () => setDropdownOpen((prevState) => !prevState);
+
 	// UseEffects
 	useEffect(() => {
-		if (!CALLING) getPokemons();
-		isAuthenticated().catch((_) => window.location.replace("/login"));
+		if (!CALLING) {
+			getPokemons();
+			getPokemonTeam();
+		};
+		isAuthenticated().then((_) =>
+			!_ ? window.location.replace("/login") : () => {}
+		);
 	}, []);
 
 	useEffect(() => {
@@ -281,6 +318,12 @@ function App() {
 							>
 								Time pokemon
 							</DropdownItem>
+							
+							<DropdownItem
+								onClick={logout}
+							>
+								Sair
+							</DropdownItem>
 						</DropdownMenu>
 					</Dropdown>
 				</div>
@@ -300,7 +343,7 @@ function PokemonTeam({ handleCloseModal }: PokemonTeamProps) {
 	return (
 		<Modal
 			isOpen
-			size=""
+			size=''
 			centered
 		>
 			<ModalHeader toggle={handleCloseModal}>

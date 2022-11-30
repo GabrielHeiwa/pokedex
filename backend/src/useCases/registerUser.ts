@@ -6,6 +6,13 @@ async function registerUser(req: Request, res: Response) {
 	try {
 		const { trainer_name, password } = req.body;
 
+		const trainerNameAlreadyExist = await prisma.trainer.findUnique({
+			where: { trainer_name },
+		});
+
+		if (trainerNameAlreadyExist)
+			throw new Error("Nome de treinador já está em uso");
+
 		const trainer = await prisma.trainer.create({
 			data: {
 				trainer_name,
@@ -19,7 +26,9 @@ async function registerUser(req: Request, res: Response) {
 		});
 	} catch (error: any) {
 		const errorMessage = error.message;
-		throw new Error(errorMessage);
+		return res.status(400).json({
+			message: errorMessage,
+		});
 	}
 }
 

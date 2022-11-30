@@ -25,8 +25,8 @@ model Team {
   id        String   @id @default(uuid())
   Trainer   Trainer  @relation(fields: [trainerId], references: [id])
   trainerId String
-  pokemons  Pokemon? @relation(fields: [pokemonId], references: [id])
-  pokemonId String?
+  pokemons  Pokemon? @relation(fields: [pokemonName], references: [name])
+  pokemonName String?
 
   @@map("teams")
 }

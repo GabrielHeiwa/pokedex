@@ -26,17 +26,22 @@ function PokemonCard(props: PokemonCardProps) {
 	// Functions
 	async function favAndUnfPokemon() {
 		try {
-			await api.post("/favorite", {
-				trainerId: getCookie("@pokedex/trainerId"),
-				pokemon,
-			});
-
 			const _team = [...team];
 			const pokemonHasTeam = _team.findIndex(
 				({ name }) => name === pokemon.name
 			);
-			if (pokemonHasTeam < 0) dispatch(setTeam([..._team, pokemon]));
-			else {
+			if (pokemonHasTeam < 0) {
+				await api.post("/favorite", {
+					trainerId: getCookie("@pokedex/trainerId"),
+					pokemon,
+				});
+				dispatch(setTeam([..._team, pokemon]));
+			} else {
+				await api.post("/disfavorite", {
+					pokemonName: pokemon.name,
+					trainerId: getCookie("@pokedex/trainerId"),
+				});
+
 				_team.splice(pokemonHasTeam, 1);
 				dispatch(setTeam(_team));
 			}
