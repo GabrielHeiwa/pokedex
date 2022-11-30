@@ -1,20 +1,32 @@
-
 const cookies: any = [];
 
-function setCookie(cname: string, cvalue: string) {
+function setCookie(cname: string, cvalue: string, exdays: number) {
+	cookies.push({ key: cname, value: cvalue });
+	const d = new Date();
+	d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
+	let expires = "expires=" + d.toUTCString();
+	document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 
+	return;
 }
 
-function getCookie() {
+function getCookie(cname: string) {
+	const cookie = cookies[cname];
+	if (cookie) return cookie;
 
+	let name = cname + "=";
+	let decodedCookie = decodeURIComponent(document.cookie);
+	let ca = decodedCookie.split(";");
+	for (let i = 0; i < ca.length; i++) {
+		let c = ca[i];
+		while (c.charAt(0) == " ") {
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+			return c.substring(name.length, c.length);
+		}
+	}
+	return "";
 }
 
-function parseCookies() {
-
-}
-
-export { 
-    setCookie,
-    getCookie,
-    parseCookies,
-}
+export { setCookie, getCookie };

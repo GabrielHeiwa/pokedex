@@ -1,23 +1,39 @@
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Form, Input, Label, FormGroup } from "reactstrap";
+import { useAuth } from "../hooks/auth";
 import { api } from "../services/api";
+import { setCookie } from "../utils/cookies";
 
 function Login() {
+	// Contexts
+	const { isAuthenticated } = useAuth();
+
 	// Hooks
 	const { control, handleSubmit } = useForm();
 
 	// Functions
 	async function onSubmit(data: any) {
 		try {
-			const { headers } = await api.post("/login", data);
-			console.log(headers["set-cookie"])
+			const response = await api.post("/login", data);
 			toast.success("Usuário logado com sucesso");
+			setCookie("@pokedex/trainerId", response.data.trainerId, 1);
+			window.location.replace("/pokedex");
 		} catch (error: any) {
 			const errorMessage = error.message || error.response.data.message;
 			toast.error(errorMessage);
 		}
 	}
+
+	// UseEffects
+	useEffect(() => {
+		isAuthenticated()
+			.then(status => {
+				console.log({ status })
+				return status ? window.location.replace("/pokedex") : () => {}
+			})
+	}, [])
 
 	return (
 		<div

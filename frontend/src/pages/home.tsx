@@ -13,9 +13,11 @@ import {
 	DropdownToggle,
 	Form,
 	Input,
-	InputGroup, Spinner
+	InputGroup,
+	Spinner,
 } from "reactstrap";
 import { PokemonCard } from "../components/pokemon";
+import { useAuth } from "../hooks/auth";
 import { pokeApi } from "../services/pokeApi";
 
 const TOTAL_OF_POKEMONS = 1154;
@@ -67,6 +69,9 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 function App() {
+	// Contexts
+	const { isAuthenticated } = useAuth();
+
 	// States
 	const [pokemons, setPokemons] = useState<Pokemon[]>([]);
 	const [page, setPage] = useState(1);
@@ -139,6 +144,7 @@ function App() {
 	// UseEffects
 	useEffect(() => {
 		// if (!CALLING) getPokemons();
+		isAuthenticated().catch((_) => window.location.replace("/login"));
 	}, []);
 
 	useEffect(() => {
@@ -173,7 +179,7 @@ function App() {
 						render={({ field: { onChange } }) => (
 							<InputGroup>
 								<Input
-                  bsSize="lg"
+									bsSize='lg'
 									onChange={(e) => {
 										onChange(e);
 										debounce(

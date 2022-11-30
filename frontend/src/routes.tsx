@@ -8,7 +8,7 @@ function WebRoutes() {
 		<BrowserRouter>
 			<Routes>
 				<Route
-					path='/'
+					path='/pokedex'
 					element={<App />}
 				/>
 				<Route

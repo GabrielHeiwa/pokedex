@@ -1,22 +1,34 @@
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Form, Input, Label, FormGroup } from "reactstrap";
+import { useAuth } from "../hooks/auth";
 import { api } from "../services/api";
+import { setCookie } from "../utils/cookies";
 
 function Register() {
+	const { isAuthenticated } = useAuth();
+
 	// Hooks
 	const { control, handleSubmit } = useForm();
 
 	// Functions
 	async function onSubmit(data: any) {
 		try {
-			await api.post("/register", data);
+			const response = await api.post("/register", data);
 			toast.success("Usuário criado com sucesso");
+			setCookie("@pokedex/trainerId", response.data.trainerId, 1);
+			window.location.replace("/pokedex");
 		} catch (error: any) {
 			const errorMessage = error.message || error.response.data.message;
 			toast.error(errorMessage);
 		}
 	}
+
+	// UseEffects
+	useEffect(() => {
+		isAuthenticated().then((_) => window.location.replace("/pokedex"));
+	}, []);
 
 	return (
 		<div
@@ -88,3 +100,6 @@ function Register() {
 }
 
 export { Register };
+function isAuthenticated() {
+	throw new Error("Function not implemented.");
+}
